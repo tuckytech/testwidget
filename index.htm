@@ -1,105 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Widget Test Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Page</title>
+<script>
+window.addEventListener('message', (event) => {
+  // event.data is an object: { WorkflowAPICall: "<some string>" }
+  const eventDataParsed = JSON.parse(event.data.WorkflowAPICall);
 
-  <script>
-    // Listen for messages from the child iframe
-    window.addEventListener("message", function(event) {
-      // OPTIONAL: If you want to ensure the message only comes from your Bubble domain,
-      // you can do: if (event.origin !== "https://greenthechain.com") return;
-      
-      // event.data should be an object of shape { WorkflowAPICall: "<JSON string>" }
-      // Example:
-      //   {
-      //     WorkflowAPICall: "{\"endpoint\":\"close-popup\"}"
-      //   }
-      const data = event.data;
-      console.log("Raw message data from child:", data);
+  switch (eventDataParsed.endpoint) {
 
-      // If data.WorkflowAPICall is missing, skip
-      if (!data || !data.WorkflowAPICall) {
-        console.warn("No WorkflowAPICall in event data");
-        return;
-      }
-
-      // Parse the JSON string inside data.WorkflowAPICall
-      let parsed;
-      try {
-        parsed = JSON.parse(data.WorkflowAPICall);
-      } catch (err) {
-        console.error("Failed to parse JSON:", err);
-        return;
-      }
-
-      // Now we should have something like { endpoint: "close-popup", ... }
-      console.log("Parsed child message:", parsed);
-
-      switch (parsed.endpoint) {
-        case "open-popup":
-          openPopup();
-          break;
+    
+        case "open-widgetpopup":
+            console.log("Entered case 'open-popup'");
+            document.getElementById("widgetpopup").height = "100%";
+            document.getElementById("widgetpopup").width = "100%";
+            document.getElementById("widgetpopup").style.position = "fixed";
+            document.getElementById("widgetpopup").style.left = "50%";
+            document.getElementById("widgetpopup").style.top = "50%";
+            document.getElementById("widgetpopup").style.right = "0";
+            document.getElementById("widgetpopup").style.bottom = "0";
+            document.getElementById("widgetpopup").style.transform = "translate(-50%, -50%)";
+            document.getElementById("widgetpopup").style.backgroundColor = "rgba(0,0,0,.4)";
+            document.getElementById("widgetpopup").style.zIndex = "9999999999999999";
+            break;
         case "close-popup":
-          closePopup();
-          break;
-        default:
-          console.warn("Unknown endpoint:", parsed.endpoint);
-      }
-    });
-
-    // Example "open popup" function
-    function openPopup() {
-      const iframe = document.getElementById("widgetpopup");
-      iframe.style.position = "fixed";
-      iframe.style.top = "50%";
-      iframe.style.left = "50%";
-      iframe.style.transform = "translate(-50%, -50%)";
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
-      iframe.style.backgroundColor = "rgba(0,0,0,0.4)";
-      iframe.style.zIndex = "999999999"; // super high so it's on top
+            console.log("Entered case 'close-widgetpopup'");
+            document.getElementById("widgetpopup").height = "40px";
+            document.getElementById("widgetpopup").width = "150px";
+            document.getElementById("widgetpopup").style.position = "relative";
+            document.getElementById("widgetpopup").style.left = "inherit";
+            document.getElementById("widgetpopup").style.top = "inherit";
+            document.getElementById("widgetpopup").style.right = "inherit";
+            document.getElementById("widgetpopup").style.bottom = "inherit";
+            document.getElementById("widgetpopup").style.transform = "none";
+            document.getElementById("widgetpopup").style.backgroundColor = "rgba(1,1,1,0)";
+            document.getElementById("widgetpopup").style.zIndex = "1";
+            break;
     }
+}, false);
+</script>
 
-    // Example "close popup" function
-    function closePopup() {
-      const iframe = document.getElementById("widgetpopup");
-      iframe.style.position = "relative";
-      iframe.style.top = "initial";
-      iframe.style.left = "initial";
-      iframe.style.transform = "none";
-      iframe.style.width = "450px";
-      iframe.style.height = "450px";
-      iframe.style.backgroundColor = "rgba(1,1,1,0)";
-      iframe.style.zIndex = "1";
-    }
-  </script>
 </head>
 <body>
-  <h1>Parent Page Hosting the Bubble Iframe</h1>
+    <!-- Iframe with the widget -->
+<script type="text/javascript"> 
 
-  <!-- Let's create the iframe dynamically on DOMContentLoaded -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      // We'll use the current parent's URL (or use something else if you want)
-      const url = encodeURIComponent(window.location.href);
+url = parent.document.URL; 
 
-      // Create the iframe element
-      const iframe = document.createElement("iframe");
-      iframe.id = "widgetpopup";
-      iframe.src = "https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500"
-                 + "?websiteSourceURL=" + url;
-      iframe.width = "450";
-      iframe.height = "450";
-      iframe.style.display = "block";
-      iframe.style.margin = "0 auto";
-      iframe.setAttribute("frameborder", "0");
-      iframe.setAttribute("scrolling", "no");
+document.write('<iframe id="widgetpopup" style="margin: 0px auto; display: block;" xml="lang" src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '/" width="400" height="476" frameborder="0" scrolling="no"></iframe>');
 
-      // Append the iframe to the body
-      document.body.appendChild(iframe);
-    });
-  </script>
+</script>
 </body>
 </html>
