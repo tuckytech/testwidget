@@ -13,48 +13,86 @@
       // Parse the JSON payload from Bubble
       const eventDataParsed = JSON.parse(event.data.WorkflowAPICall);
 
+      // Get references to the overlay and the iframe
+      const overlay = document.getElementById("overlay");
+      const widgetPopup = document.getElementById("widgetpopup");
+
       switch (eventDataParsed.endpoint) {
-        case "open-popup":
-          console.log("Entered case 'open-popup'");
-          document.getElementById("widgetpopup").style.height = "100%";
-          document.getElementById("widgetpopup").style.width = "100%";
-          document.getElementById("widgetpopup").style.position = "fixed";
-          document.getElementById("widgetpopup").style.left = "50%";
-          document.getElementById("widgetpopup").style.top = "50%";
-          document.getElementById("widgetpopup").style.transform = "translate(-50%, -50%)";
-          document.getElementById("widgetpopup").style.backgroundColor = "rgba(0,0,0,.4)";
-          document.getElementById("widgetpopup").style.zIndex = "9999999999999999";
+        case "open-widgetpopup":
+          console.log("Entered case 'open-widgetpopup'");
+
+          // Show the overlay (dims background)
+          overlay.style.display = "block";
+
+          // Make the iframe fill the screen & be scrollable
+          widgetPopup.style.height = "100%";
+          widgetPopup.style.width = "100%";
+          widgetPopup.style.position = "fixed";
+          widgetPopup.style.left = "50%";
+          widgetPopup.style.top = "50%";
+          widgetPopup.style.transform = "translate(-50%, -50%)";
+          widgetPopup.style.zIndex = "9999999999999999";
           break;
 
         case "close-popup":
           console.log("Entered case 'close-popup'");
-          document.getElementById("widgetpopup").style.height = "476px";
-          document.getElementById("widgetpopup").style.width = "400px";
-          document.getElementById("widgetpopup").style.position = "relative";
-          document.getElementById("widgetpopup").style.left = "inherit";
-          document.getElementById("widgetpopup").style.top = "inherit";
-          document.getElementById("widgetpopup").style.transform = "none";
-          document.getElementById("widgetpopup").style.backgroundColor = "rgba(0,0,0,0)";
-          document.getElementById("widgetpopup").style.zIndex = "1";
+
+          // Hide the overlay
+          overlay.style.display = "none";
+
+          // Restore the iframe’s smaller size
+          widgetPopup.style.height = "476px";
+          widgetPopup.style.width = "400px";
+          widgetPopup.style.position = "relative";
+          widgetPopup.style.left = "inherit";
+          widgetPopup.style.top = "inherit";
+          widgetPopup.style.transform = "none";
+          widgetPopup.style.zIndex = "1";
           break;
       }
     }, false);
   </script>
+
+  <style>
+    /* The overlay that dims everything behind the iframe */
+    #overlay {
+      display: none; /* shown when "open-widgetpopup" is triggered */
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4); 
+      z-index: 9999999999999998; /* behind the iframe but above the page */
+    }
+
+    /* We start the iframe at a small size (like original) */
+    #widgetpopup {
+      margin: 0 auto;
+      display: block;
+    }
+  </style>
 </head>
 <body>
+  <!-- Overlay that darkens the page, with the iframe inside it -->
+  <div id="overlay">
+    <!-- The Bubble widget iframe; set scrolling to auto for vertical scrolling -->
+    <iframe
+      id="widgetpopup"
+      src=""
+      width="400"
+      height="476"
+      frameborder="0"
+      scrolling="auto"
+    ></iframe>
+  </div>
+
   <script type="text/javascript">
     // Dynamically build the iframe src with the parent's URL
     const url = parent.document.URL;
-    document.write(
-      '<iframe id="widgetpopup" ' +
-        'style="margin: 0 auto; display: block;" ' +
-        'src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '" ' +
-        'width="400" ' +
-        'height="476" ' +
-        'frameborder="0" ' +
-        'scrolling="no">' +
-      '</iframe>'
-    );
+    // Inject that URL as a query parameter into the iframe's src
+    document.getElementById("widgetpopup").src =
+      "https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=" + url;
   </script>
 </body>
 </html>
