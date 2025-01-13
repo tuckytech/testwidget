@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Page</title>
+    <script type="text/javascript">
+        // Ensure the DOM is loaded before executing the script
+        document.addEventListener("DOMContentLoaded", function() {
+            // Add event listener for receiving messages from the iframe
+            window.addEventListener('message', function(event) {
+                // Check the origin to ensure it's from the trusted source
+                if (event.origin !== 'https://greenthechain.com') return;
+
+                // Parse the message data
+                var eventDataParsed = JSON.parse(event.data);
+                console.log("Received message: ", eventDataParsed);
+
+                // Handle different actions based on the endpoint
+                switch (eventDataParsed.endpoint) {
+                    case "open-popup":
+                        openPopup();
+                        break;
+                    case "close-popup":
+                        closePopup();
+                        break;
+                }
+            }, false);
+
+            // Function to open the popup
+            function openPopup() {
+                var iframe = document.getElementById("widgetpopup");
+                iframe.style.position = "fixed";
+                iframe.style.top = "50%";
+                iframe.style.left = "50%";
+                iframe.style.transform = "translate(-50%, -50%)";
+                iframe.style.zIndex = "9999";
+                iframe.style.height = "100%";
+                iframe.style.width = "100%";
+                iframe.style.backgroundColor = "rgba(0,0,0,0.5)";
+            }
+
+            // Function to close the popup
+            function closePopup() {
+                var iframe = document.getElementById("widgetpopup");
+                iframe.style.position = "relative";
+                iframe.style.height = "40px";
+                iframe.style.width = "150px";
+                iframe.style.backgroundColor = "rgba(1,1,1,0)";
+                iframe.style.zIndex = "1";
+            }
+        });
+    </script>
+</head>
+<body>
+    <!-- Iframe with the widget -->
+    <script type="text/javascript">
+        // Wait until the DOM is loaded before adding the iframe
+        document.addEventListener("DOMContentLoaded", function() {
+            var url = encodeURIComponent(parent.document.URL); // URL encoding for safety
+            document.write('<iframe id="widgetpopup" style="margin: 0px auto; display: block;" xml="lang" src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '" width="400" height="476" frameborder="0" scrolling="no"></iframe>');
+        });
+    </script>
+</body>
+</html>
