@@ -1,56 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Widget Page</title>
-<script>
-window.addEventListener('message', (event) => {
-  // event.data is an object: { WorkflowAPICall: "<some string>" }
-  const eventDataParsed = JSON.parse(event.data.WorkflowAPICall);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Widget Page</title>
+  <script>
+    // Listen for messages from the iframe
+    window.addEventListener('message', (event) => {
+      // Ensure there's a valid data structure
+      if (!event.data || !event.data.WorkflowAPICall) return;
 
-  switch (eventDataParsed.endpoint) {
+      // Parse the JSON payload from Bubble
+      const eventDataParsed = JSON.parse(event.data.WorkflowAPICall);
 
-    
-        case "open-widgetpopup":
-            console.log("Entered case 'open-popup'");
-            document.getElementById("widgetpopup").height = "100%";
-            document.getElementById("widgetpopup").width = "100%";
-            document.getElementById("widgetpopup").style.position = "fixed";
-            document.getElementById("widgetpopup").style.left = "50%";
-            document.getElementById("widgetpopup").style.top = "50%";
-            document.getElementById("widgetpopup").style.right = "0";
-            document.getElementById("widgetpopup").style.bottom = "0";
-            document.getElementById("widgetpopup").style.transform = "translate(-50%, -50%)";
-            document.getElementById("widgetpopup").style.backgroundColor = "rgba(0,0,0,.4)";
-            document.getElementById("widgetpopup").style.zIndex = "9999999999999999";
-            break;
+      switch (eventDataParsed.endpoint) {
+        case "open-popup":
+          console.log("Entered case 'open-popup'");
+          document.getElementById("widgetpopup").style.height = "100%";
+          document.getElementById("widgetpopup").style.width = "100%";
+          document.getElementById("widgetpopup").style.position = "fixed";
+          document.getElementById("widgetpopup").style.left = "50%";
+          document.getElementById("widgetpopup").style.top = "50%";
+          document.getElementById("widgetpopup").style.transform = "translate(-50%, -50%)";
+          document.getElementById("widgetpopup").style.backgroundColor = "rgba(0,0,0,.4)";
+          document.getElementById("widgetpopup").style.zIndex = "9999999999999999";
+          break;
+
         case "close-popup":
-            console.log("Entered case 'close-widgetpopup'");
-            document.getElementById("widgetpopup").height = "476px";
-            document.getElementById("widgetpopup").width = "400px";
-            document.getElementById("widgetpopup").style.position = "relative";
-            document.getElementById("widgetpopup").style.left = "inherit";
-            document.getElementById("widgetpopup").style.top = "inherit";
-            document.getElementById("widgetpopup").style.right = "inherit";
-            document.getElementById("widgetpopup").style.bottom = "inherit";
-            document.getElementById("widgetpopup").style.transform = "none";
-            document.getElementById("widgetpopup").style.backgroundColor = "rgba(1,1,1,0)";
-            document.getElementById("widgetpopup").style.zIndex = "1";
-            break;
-    }
-}, false);
-</script>
-
+          console.log("Entered case 'close-popup'");
+          document.getElementById("widgetpopup").style.height = "476px";
+          document.getElementById("widgetpopup").style.width = "400px";
+          document.getElementById("widgetpopup").style.position = "relative";
+          document.getElementById("widgetpopup").style.left = "inherit";
+          document.getElementById("widgetpopup").style.top = "inherit";
+          document.getElementById("widgetpopup").style.transform = "none";
+          document.getElementById("widgetpopup").style.backgroundColor = "rgba(0,0,0,0)";
+          document.getElementById("widgetpopup").style.zIndex = "1";
+          break;
+      }
+    }, false);
+  </script>
 </head>
 <body>
-    <!-- Iframe with the widget -->
-<script type="text/javascript"> 
-
-url = parent.document.URL; 
-
-document.write('<iframe id="widgetpopup" style="margin: 0px auto; display: block;" xml="lang" src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '/" width="400" height="476" frameborder="0" scrolling="no"></iframe>');
-
-</script>
+  <script type="text/javascript">
+    // Dynamically build the iframe src with the parent's URL
+    const url = parent.document.URL;
+    document.write(
+      '<iframe id="widgetpopup" ' +
+        'style="margin: 0 auto; display: block;" ' +
+        'src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '" ' +
+        'width="400" ' +
+        'height="476" ' +
+        'frameborder="0" ' +
+        'scrolling="no">' +
+      '</iframe>'
+    );
+  </script>
 </body>
 </html>
