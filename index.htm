@@ -1,75 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Widget Page</title>
-    <script type="text/javascript">
-        // Ensure the DOM is loaded before executing the script
-        document.addEventListener("DOMContentLoaded", function() {
-            // Add event listener for receiving messages from the iframe
-            window.addEventListener('message', function(event) {
-                // Check the origin to ensure it's from the trusted source
-                if (event.origin !== 'https://greenthechain.com') return;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Widget Test Page</title>
 
-                // Parse the message data
-                var eventDataParsed = JSON.parse(event.data);
-                console.log("Received message: ", eventDataParsed);
+  <script>
+    // Listen for messages from the child iframe
+    window.addEventListener("message", function(event) {
+      // OPTIONAL: If you want to ensure the message only comes from your Bubble domain,
+      // you can do: if (event.origin !== "https://greenthechain.com") return;
+      
+      // event.data should be an object of shape { WorkflowAPICall: "<JSON string>" }
+      // Example:
+      //   {
+      //     WorkflowAPICall: "{\"endpoint\":\"close-popup\"}"
+      //   }
+      const data = event.data;
+      console.log("Raw message data from child:", data);
 
-                // Handle different actions based on the endpoint
-                switch (eventDataParsed.endpoint) {
-                    case "open-popup":
-                        openPopup();
-                        break;
-                    case "close-popup":
-                        closePopup();
-                        break;
-                }
-            }, false);
+      // If data.WorkflowAPICall is missing, skip
+      if (!data || !data.WorkflowAPICall) {
+        console.warn("No WorkflowAPICall in event data");
+        return;
+      }
 
-            // Function to open the popup
-            function openPopup() {
-                var iframe = document.getElementById("widgetpopup");
-                iframe.style.position = "fixed";
-                iframe.style.top = "50%";
-                iframe.style.left = "50%";
-                iframe.style.transform = "translate(-50%, -50%)";
-                iframe.style.zIndex = "9999";
-                iframe.style.height = "100%";
-                iframe.style.width = "100%";
-                iframe.style.backgroundColor = "rgba(0,0,0,0.5)";
-            }
+      // Parse the JSON string inside data.WorkflowAPICall
+      let parsed;
+      try {
+        parsed = JSON.parse(data.WorkflowAPICall);
+      } catch (err) {
+        console.error("Failed to parse JSON:", err);
+        return;
+      }
 
-            // Function to close the popup
-            function closePopup() {
-                var iframe = document.getElementById("widgetpopup");
-                iframe.style.position = "relative";
-                iframe.style.height = "40px";
-                iframe.style.width = "150px";
-                iframe.style.backgroundColor = "rgba(1,1,1,0)";
-                iframe.style.zIndex = "1";
-            }
-        });
-    </script>
+      // Now we should have something like { endpoint: "close-popup", ... }
+      console.log("Parsed child message:", parsed);
+
+      switch (parsed.endpoint) {
+        case "open-popup":
+          openPopup();
+          break;
+        case "close-popup":
+          closePopup();
+          break;
+        default:
+          console.warn("Unknown endpoint:", parsed.endpoint);
+      }
+    });
+
+    // Example "open popup" function
+    function openPopup() {
+      const iframe = document.getElementById("widgetpopup");
+      iframe.style.position = "fixed";
+      iframe.style.top = "50%";
+      iframe.style.left = "50%";
+      iframe.style.transform = "translate(-50%, -50%)";
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.backgroundColor = "rgba(0,0,0,0.4)";
+      iframe.style.zIndex = "999999999"; // super high so it's on top
+    }
+
+    // Example "close popup" function
+    function closePopup() {
+      const iframe = document.getElementById("widgetpopup");
+      iframe.style.position = "relative";
+      iframe.style.top = "initial";
+      iframe.style.left = "initial";
+      iframe.style.transform = "none";
+      iframe.style.width = "150px";
+      iframe.style.height = "40px";
+      iframe.style.backgroundColor = "rgba(1,1,1,0)";
+      iframe.style.zIndex = "1";
+    }
+  </script>
 </head>
 <body>
-    <!-- Iframe with the widget -->
-    <script type="text/javascript">
-        // Wait until the DOM is loaded before adding the iframe
-document.addEventListener("DOMContentLoaded", function() {
-  var url = encodeURIComponent(window.location.href);
-  var iframe = document.createElement('iframe');
-  iframe.id = "widgetpopup";
-  iframe.src = "https://greenthechain.com/version-test/widget2/...?websiteSourceURL=" + url;
-  iframe.width = "400";
-  iframe.height = "476";
-  iframe.scrolling = "yes";
-  iframe.style.display = "block";
-  iframe.style.margin = "0 auto";
+  <h1>Parent Page Hosting the Bubble Iframe</h1>
 
-  document.body.appendChild(iframe);
-});
+  <!-- Let's create the iframe dynamically on DOMContentLoaded -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // We'll use the current parent's URL (or use something else if you want)
+      const url = encodeURIComponent(window.location.href);
 
-    </script>
+      // Create the iframe element
+      const iframe = document.createElement("iframe");
+      iframe.id = "widgetpopup";
+      iframe.src = "https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500"
+                 + "?websiteSourceURL=" + url;
+      iframe.width = "150";
+      iframe.height = "40";
+      iframe.style.display = "block";
+      iframe.style.margin = "0 auto";
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute("scrolling", "no");
+
+      // Append the iframe to the body
+      document.body.appendChild(iframe);
+    });
+  </script>
 </body>
 </html>
