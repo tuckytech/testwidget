@@ -4,62 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Widget Page</title>
-    <script type="text/javascript">
-        // Ensure the DOM is loaded before executing the script
-        document.addEventListener("DOMContentLoaded", function() {
-            // Add event listener for receiving messages from the iframe
-            window.addEventListener('message', function(event) {
-                // Check the origin to ensure it's from the trusted source
-                if (event.origin !== 'https://greenthechain.com') return;
+<script>
+window.addEventListener('message', (event) => {
+    var eventDataParsed = JSON.parse(event.data.WorkflowAPICall);
+    console.log("body" + eventDataParsed.body);
+    switch (eventDataParsed.endpoint) {
+        case "open-widgetpopup":
+            console.log("Entered case 'open-popup'");
+            document.getElementById("widgetpopup").height = "100%";
+            document.getElementById("widgetpopup").width = "100%";
+            document.getElementById("widgetpopup").style.position = "fixed";
+            document.getElementById("widgetpopup").style.left = "50%";
+            document.getElementById("widgetpopup").style.top = "50%";
+            document.getElementById("widgetpopup").style.right = "0";
+            document.getElementById("widgetpopup").style.bottom = "0";
+            document.getElementById("widgetpopup").style.transform = "translate(-50%, -50%)";
+            document.getElementById("widgetpopup").style.backgroundColor = "rgba(0,0,0,.4)";
+            document.getElementById("widgetpopup").style.zIndex = "9999999999999999";
+            break;
+        case "close-popup":
+            console.log("Entered case 'close-widgetpopup'");
+            document.getElementById("widgetpopup").height = "40px";
+            document.getElementById("widgetpopup").width = "150px";
+            document.getElementById("widgetpopup").style.position = "relative";
+            document.getElementById("widgetpopup").style.left = "inherit";
+            document.getElementById("widgetpopup").style.top = "inherit";
+            document.getElementById("widgetpopup").style.right = "inherit";
+            document.getElementById("widgetpopup").style.bottom = "inherit";
+            document.getElementById("widgetpopup").style.transform = "none";
+            document.getElementById("widgetpopup").style.backgroundColor = "rgba(1,1,1,0)";
+            document.getElementById("widgetpopup").style.zIndex = "1";
+            break;
+    }
+}, false);
+</script>
 
-                // Parse the message data
-                var eventDataParsed = JSON.parse(event.data);
-                console.log("Received message: ", eventDataParsed);
-
-                // Handle different actions based on the endpoint
-                switch (eventDataParsed.endpoint) {
-                    case "open-popup":
-                        openPopup();
-                        break;
-                    case "close-popup":
-                        closePopup();
-                        break;
-                }
-            }, false);
-
-            // Function to open the popup
-            function openPopup() {
-                var iframe = document.getElementById("widgetpopup");
-                iframe.style.position = "fixed";
-                iframe.style.top = "50%";
-                iframe.style.left = "50%";
-                iframe.style.transform = "translate(-50%, -50%)";
-                iframe.style.zIndex = "9999";
-                iframe.style.height = "100%";
-                iframe.style.width = "100%";
-                iframe.style.backgroundColor = "rgba(0,0,0,0.5)";
-            }
-
-            // Function to close the popup
-            function closePopup() {
-                var iframe = document.getElementById("widgetpopup");
-                iframe.style.position = "relative";
-                iframe.style.height = "40px";
-                iframe.style.width = "150px";
-                iframe.style.backgroundColor = "rgba(1,1,1,0)";
-                iframe.style.zIndex = "1";
-            }
-        });
-    </script>
 </head>
 <body>
     <!-- Iframe with the widget -->
-    <script type="text/javascript">
-        // Wait until the DOM is loaded before adding the iframe
-        document.addEventListener("DOMContentLoaded", function() {
-            var url = encodeURIComponent(parent.document.URL); // URL encoding for safety
-            document.write('<iframe id="widgetpopup" style="margin: 0px auto; display: block;" xml="lang" src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '" width="400" height="476" frameborder="0" scrolling="no"></iframe>');
-        });
-    </script>
+<script type="text/javascript"> 
+
+url = parent.document.URL; 
+
+document.write('<iframe id="widgetpopup" style="margin: 0px auto; display: block;" xml="lang" src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '/" width="400" height="476" frameborder="0" scrolling="no"></iframe>');
+
+</script>
 </body>
 </html>
