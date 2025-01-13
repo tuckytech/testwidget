@@ -32,6 +32,7 @@
           widgetPopup.style.top = "50%";
           widgetPopup.style.transform = "translate(-50%, -50%)";
           widgetPopup.style.zIndex = "9999999999999999";
+          widgetPopup.setAttribute("scrolling", "auto"); 
           break;
 
         case "close-popup":
@@ -48,6 +49,7 @@
           widgetPopup.style.top = "inherit";
           widgetPopup.style.transform = "none";
           widgetPopup.style.zIndex = "1";
+          widgetPopup.setAttribute("scrolling", "no");
           break;
       }
     }, false);
@@ -76,23 +78,30 @@
 <body>
   <!-- Overlay that darkens the page, with the iframe inside it -->
   <div id="overlay">
-    <!-- The Bubble widget iframe; set scrolling to auto for vertical scrolling -->
+    <!-- The Bubble widget iframe -->
     <iframe
       id="widgetpopup"
       src=""
       width="400"
       height="476"
       frameborder="0"
-      scrolling="auto"
+      scrolling="no"
     ></iframe>
   </div>
 
   <script type="text/javascript">
-    // Dynamically build the iframe src with the parent's URL
-    const url = parent.document.URL;
-    // Inject that URL as a query parameter into the iframe's src
+    // Safely build the iframe src. If parent.document.URL is inaccessible, use window.location.href
+    let parentUrl;
+    try {
+      parentUrl = parent.document.URL; // Can fail if cross-domain or file://
+    } catch (err) {
+      console.warn("Could not access parent.document.URL. Using window.location.href instead.");
+      parentUrl = window.location.href;
+    }
+
+    // Inject the parent's (or fallback) URL into the iframe's src
     document.getElementById("widgetpopup").src =
-      "https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=" + url;
+      "https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=" + parentUrl;
   </script>
 </body>
 </html>
