@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Widget Page</title>
 
-  <!-- Overlay & Iframe CSS -->
   <style>
-    /* Creates a dark overlay behind the iframe when body has .overlay-active */
+    /* 1) Create a dark overlay behind the iframe via body.overlay-active::before. */
     body.overlay-active::before {
       content: "";
       display: block;
@@ -17,22 +16,24 @@
       width: 100vw;
       height: 100vh;
       background: rgba(0, 0, 0, 0.4);
-      z-index: 9999999999; /* behind the iframe */
+      z-index: 9999999998; /* The iframe goes above this. */
     }
 
-    /* The iframe starts at small size; we put it on top of the overlay */
+    /* 2) Style for the iframe in normal (closed) state. */
     #widgetpopup {
-      position: relative;
-      z-index: 10000000000; 
       margin: 0 auto;
       display: block;
+      position: relative;
+      width: 400px;
+      height: 476px;
+      z-index: 9999999999; /* Enough to be on top of the overlay. */
     }
   </style>
 
   <script>
     // Listen for messages from the iframe
     window.addEventListener('message', (event) => {
-      // Ensure there's a valid data structure
+      // Check if there's a valid WorkflowAPICall
       if (!event.data || !event.data.WorkflowAPICall) return;
 
       // Parse the JSON payload from Bubble
@@ -42,33 +43,33 @@
       switch (eventDataParsed.endpoint) {
         case "open-widgetpopup":
           console.log("Entered case 'open-widgetpopup'");
-          // Add the overlay class to the BODY
-          document.body.classList.add('overlay-active');
+          // 1) Add the overlay behind the iframe
+          document.body.classList.add("overlay-active");
 
-          // Make the iframe fill the screen & be scrollable
-          widgetPopup.style.height = "100%";
-          widgetPopup.style.width = "100%";
+          // 2) Make the iframe fill the screen and allow scrolling
           widgetPopup.style.position = "fixed";
-          widgetPopup.style.left = "50%";
           widgetPopup.style.top = "50%";
+          widgetPopup.style.left = "50%";
           widgetPopup.style.transform = "translate(-50%, -50%)";
-          widgetPopup.style.zIndex = "10000000000";
-          widgetPopup.setAttribute("scrolling", "auto"); 
+          widgetPopup.style.width = "100%";
+          widgetPopup.style.height = "100%";
+          widgetPopup.style.zIndex = "9999999999";
+          widgetPopup.setAttribute("scrolling", "auto");
           break;
 
         case "close-popup":
           console.log("Entered case 'close-popup'");
-          // Remove the overlay
-          document.body.classList.remove('overlay-active');
+          // 1) Remove the dark overlay
+          document.body.classList.remove("overlay-active");
 
-          // Restore the iframe’s smaller size
-          widgetPopup.style.height = "476px";
-          widgetPopup.style.width = "400px";
+          // 2) Restore the iframe to original size
           widgetPopup.style.position = "relative";
-          widgetPopup.style.left = "inherit";
           widgetPopup.style.top = "inherit";
+          widgetPopup.style.left = "inherit";
           widgetPopup.style.transform = "none";
-          widgetPopup.style.zIndex = "1";
+          widgetPopup.style.width = "400px";
+          widgetPopup.style.height = "476px";
+          widgetPopup.style.zIndex = "9999999999";
           widgetPopup.setAttribute("scrolling", "no");
           break;
       }
@@ -77,9 +78,9 @@
 </head>
 
 <body>
+  <!-- The only thing we inject into the <body> is the <iframe> itself. -->
   <script type="text/javascript">
-    // Dynamically build the iframe src using the parent's URL
-    // (If cross-domain issues occur, replace parent.document.URL with window.location.href)
+    // Safely get the parent URL (in case cross-domain blocks parent.document.URL)
     let url;
     try {
       url = parent.document.URL;
@@ -87,7 +88,7 @@
       url = window.location.href;
     }
 
-    // Output the <iframe> that references your Bubble widget
+    // Render the Bubble widget's iframe
     document.write(
       '<iframe id="widgetpopup" ' +
         'src="https://greenthechain.com/version-test/widget2/1730179417198x962409578276585500?websiteSourceURL=' + url + '" ' +
